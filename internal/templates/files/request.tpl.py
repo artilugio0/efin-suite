@@ -2,6 +2,7 @@
 
 import argparse
 import urllib.request
+import http.client
 
 url = r'''https://{{ .Host }}{{ .URL }}'''
 method = r'''{{ .Method }}'''
@@ -12,26 +13,56 @@ headers = {
 }
 body = br'''{{ printf "%s" .Body }}'''
 
-def make_request(method=method, url=url, headers=headers, body=body):
-    req = urllib.request.Request(
-        url,
-        headers=headers,
-        method=method,
-        data=body,
-    )
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise urllib.error.HTTPError(
+            req.full_url, code, msg, headers, fp
+        )
 
-    return urllib.request.urlopen(req)
+def make_request(method='GET', url=None, headers=None, body=None):
+    opener = urllib.request.build_opener(NoRedirectHandler())
+    urllib.request.install_opener(opener)
 
-def print_response(response):
-    print(f'HTTP/1.1 {response.status} {response.reason}', end="\r\n")
+    result = {
+        'status_code': None,
+        'reason': None,
+        'headers': {},
+        'body': ''
+    }
 
-    for header, value in response.getheaders():
-        print(f'{header}: {value}', end="\r\n")
+    try:
+        req = urllib.request.Request(
+            url,
+            headers=headers or {},
+            method=method,
+            data=body,
+        )
+        with urllib.request.urlopen(req) as response:
+            result['status_code'] = response.getcode()
+            result['reason'] = http.client.responses.get(result['status_code'], 'Unknown')
+            result['headers'] = dict(response.getheaders())
+            result['body'] = response.read().decode('utf-8', errors='replace')
+    except urllib.error.HTTPError as e:
+        result['status_code'] = e.code
+        result['reason'] = http.client.responses.get(result['status_code'], 'Unknown')
+        result['headers'] = dict(e.headers)
+        result['body'] = e.read().decode('utf-8', errors='replace')
 
-    print(end="\r\n")
+    return result
 
-    raw_body = response.read()
-    print(raw_body.decode('latin1', errors='replace'))
+def print_response(response_dict):
+    status_code = response_dict['status_code']
+    reason = response_dict['reason']
+    headers = response_dict['headers']
+    body = response_dict['body']
+
+    raw_response = f"HTTP/1.1 {status_code} {reason}\r\n"
+    for header_name, header_value in headers.items():
+        raw_response += f"{header_name}: {header_value}\r\n"
+    raw_response += "\r\n"
+    raw_response += body
+
+    print(raw_response)
 
 def print_request(method=method, url=url, headers=headers, body=body):
     print(f'{method.upper()} {url} HTTP/1.1', end='\r\n')
@@ -50,11 +81,10 @@ def print_request(method=method, url=url, headers=headers, body=body):
 
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog='make_request.py',
-        description=f'Make a {{ .Method }} request to {url}',
+        description=f'Make a GET request to {url}',
         epilog='Script generated with Efin: https://github.com/artilugio0/efin-vibes')
 
     parser.add_argument('-m', '--method', default=method, help='change the method of the request')
@@ -81,12 +111,12 @@ if __name__ == '__main__':
         if len(headers) < prev_len:
             headers['Content-Length'] = str(len(args.body))
 
-    ## Make the request
     if args.print_request:
         print_request(args.method, args.url, headers, body)
 
-    with make_request(args.method, args.url, headers, body) as response:
-        if args.print_response:
-            print_response(response)
-        else:
-            print(f'Status: {response.status} {response.reason}')
+    response = make_request(args.method, args.url, headers, body)
+
+    if args.print_response:
+        print_response(response)
+    else:
+        print(f'Status: {response["status_code"]} {response["reason"]}')
