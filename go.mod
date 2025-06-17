@@ -3,7 +3,7 @@ module github.com/artilugio0/efin-suite
 go 1.24.3
 
 require (
-	github.com/artilugio0/replit v0.0.0-20250609151101-5ec36a509a87 // indirect
+	github.com/artilugio0/replit v0.0.0-20250617010735-bec2b65473ec // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/bubbles v0.21.0 // indirect

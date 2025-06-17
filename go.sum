@@ -1,5 +1,7 @@
 github.com/artilugio0/replit v0.0.0-20250609151101-5ec36a509a87 h1:IVrHfIWabV5y23VUKW5vGFrDiFKPHG8tpuFb8Ov3G5I=
 github.com/artilugio0/replit v0.0.0-20250609151101-5ec36a509a87/go.mod h1:1i41aNOl03/IDzzwT6GG6lCYoSLdLl7TYupNLwFaYbk=
+github.com/artilugio0/replit v0.0.0-20250617010735-bec2b65473ec h1:iAn6+TWWu7BRJ8KkAzyfBEgs9agEEAtVfWMaVGtquT0=
+github.com/artilugio0/replit v0.0.0-20250617010735-bec2b65473ec/go.mod h1:1i41aNOl03/IDzzwT6GG6lCYoSLdLl7TYupNLwFaYbk=
 github.com/atotto/clipboard v0.1.4 h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z4=
 github.com/atotto/clipboard v0.1.4/go.mod h1:ZY9tmq7sm5xIbd9bOK4onWV4S6X0u6GY7Vn0Yu86PYI=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
