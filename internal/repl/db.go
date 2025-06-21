@@ -183,6 +183,59 @@ func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height i
 		}
 	})
 
+	requestsTable.SetRowKeyBinding("t", func(row RequestsTableRow) tea.Cmd {
+		output := requestsTable.TableRawView()
+		reqId := row[1]
+
+		return func() tea.Msg {
+			req, err := getRequest(dbFile, reqId)
+			if err != nil {
+				return replit.ExitView{
+					Error: err,
+				}
+			}
+
+			funcs := map[string]any{
+				"contains": strings.Contains,
+				"contains_bytes": func(s []byte, c string) bool {
+					return bytes.Contains(s, []byte(c))
+				},
+			}
+
+			scriptTpl := templates.GetRequestTestifierScript()
+			t, err := template.New("make_request").Funcs(funcs).Parse(scriptTpl)
+			if err != nil {
+				return replit.ExitView{
+					Error: err,
+				}
+			}
+
+			f, err := os.OpenFile(req.ID+".lua", os.O_RDWR|os.O_CREATE, 0700)
+			if err != nil {
+				return replit.ExitView{
+					Error: err,
+				}
+			}
+
+			err = t.Execute(f, req)
+			if err != nil {
+				return replit.ExitView{
+					Error: err,
+				}
+			}
+			if err := f.Close(); err != nil {
+				return replit.ExitView{
+					Error: err,
+				}
+			}
+
+			output += "\nscript file saved to " + req.ID + ".lua"
+			return replit.ExitView{
+				Output: output,
+			}
+		}
+	})
+
 	requestsTable.SetRowKeyBinding("r", func(row RequestsTableRow) tea.Cmd {
 		reqId := row[1]
 		output := requestsTable.TableRawView()
