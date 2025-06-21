@@ -150,24 +150,24 @@ func (v *RequestsTableView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "K", "ctrl+k":
+		case "ctrl+k":
 			v.focus = focusTable
 			v.vp1.SetStyle(v.unfocusStyle)
 			v.vp2.SetStyle(v.unfocusStyle)
 			return v, nil
-		case "J", "ctrl+j":
+		case "ctrl+j":
 			if v.focus == focusTable {
 				v.focus = focusVp1
 				v.vp1.SetStyle(v.focusStyle)
 				v.vp2.SetStyle(v.unfocusStyle)
 				return v, nil
 			}
-		case "H", "ctrl+h":
+		case "ctrl+h":
 			v.focus = focusVp1
 			v.vp1.SetStyle(v.focusStyle)
 			v.vp2.SetStyle(v.unfocusStyle)
 			return v, nil
-		case "L", "ctrl+l":
+		case "ctrl+l":
 			v.focus = focusVp2
 			v.vp1.SetStyle(v.unfocusStyle)
 			v.vp2.SetStyle(v.focusStyle)
