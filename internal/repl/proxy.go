@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/artilugio0/efin-suite/internal/grpc/proto"
+	"github.com/artilugio0/efin-proxy/pkg/grpc/proto"
 	"github.com/artilugio0/replit"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

@@ -1,7 +1,7 @@
 package repl
 
 import (
-	"github.com/artilugio0/efin-suite/internal/grpc/proto"
+	"github.com/artilugio0/efin-proxy/pkg/grpc/proto"
 	"google.golang.org/grpc"
 )
 
