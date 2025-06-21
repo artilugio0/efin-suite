@@ -2,6 +2,8 @@ github.com/artilugio0/efin-proxy v0.0.0-20250621143318-d0e5bcf163f1 h1:HFGO0JjC+
 github.com/artilugio0/efin-proxy v0.0.0-20250621143318-d0e5bcf163f1/go.mod h1:/fjZRcB1SGOnOTAu27crXjH+OtZvYXEuzZkcpuhS9Ko=
 github.com/artilugio0/efin-proxy v0.0.0-20250621144717-c1c089e9db74 h1:YCioi7T1TY5sLvvATlefo68ZppUVzWifysKxr5KnW8E=
 github.com/artilugio0/efin-proxy v0.0.0-20250621144717-c1c089e9db74/go.mod h1:/fjZRcB1SGOnOTAu27crXjH+OtZvYXEuzZkcpuhS9Ko=
+github.com/artilugio0/efin-proxy v0.0.0-20250621173402-dfae4be2c77d h1:cpV6G8CZBYZOAorXctw6Mdlhukeh9XlTBoFm9l6KQJY=
+github.com/artilugio0/efin-proxy v0.0.0-20250621173402-dfae4be2c77d/go.mod h1:/fjZRcB1SGOnOTAu27crXjH+OtZvYXEuzZkcpuhS9Ko=
 github.com/artilugio0/efin-testifier v0.0.0-20250621145730-bbecff94ecb6 h1:lKr+rGFnYxtlcSaWBwxq2g4fRgM+jhlCe14Z8xG7LLY=
 github.com/artilugio0/efin-testifier v0.0.0-20250621145730-bbecff94ecb6/go.mod h1:/txnpNHzY+Szl+2eCKFkvo9oJY6BPyigx9UplNrt1OM=
 github.com/artilugio0/replit v0.0.0-20250609151101-5ec36a509a87 h1:IVrHfIWabV5y23VUKW5vGFrDiFKPHG8tpuFb8Ov3G5I=
