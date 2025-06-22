@@ -304,6 +304,29 @@ func (c *RequestResponseRawCondition) GetRequestJoinsString() (string, error) {
 	return "INNER JOIN headers h" + c.UniqueID + " ON h" + c.UniqueID + ".response_id = resp.response_id", nil
 }
 
+type NotCondition struct {
+	Condition RequestCondition
+}
+
+func (c *NotCondition) GetRequestConditionString() (string, []any, error) {
+	cond, values, err := c.Condition.GetRequestConditionString()
+	if err != nil {
+		return "", nil, err
+	}
+
+	condition := "not (" + cond + ")"
+	return condition, values, nil
+}
+
+func (c *NotCondition) GetRequestJoinsString() (string, error) {
+	joins, err := c.Condition.GetRequestJoinsString()
+	if err != nil {
+		return "", err
+	}
+
+	return joins, nil
+}
+
 type AndCondition struct {
 	Condition1 RequestCondition
 	Condition2 RequestCondition

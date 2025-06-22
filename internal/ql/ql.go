@@ -59,6 +59,7 @@ const (
 	TokenParenClose       TokenParen       = ")"
 	TokenLogicalOpAnd     TokenLogicalOp   = "and"
 	TokenLogicalOpOr      TokenLogicalOp   = "or"
+	TokenLogicalOpNot     TokenLogicalOp   = "not"
 	TEOF                  TokenEOF         = ""
 )
 
@@ -168,6 +169,8 @@ F:
 		return TokenLogicalOpAnd, pos, nil
 	case "or":
 		return TokenLogicalOpOr, pos, nil
+	case "not":
+		return TokenLogicalOpNot, pos, nil
 	}
 
 	if identifierRE.MatchString(s) {
@@ -318,7 +321,7 @@ func ParseQuery(s string) (*Query, error) {
 		}
 
 		result.Operation = QueryOperationGet
-		cond, err := parseRequestCondition(tk)
+		cond, err := parseRequestCondition(tk, true)
 		if err != nil {
 			return nil, err
 		}
@@ -339,7 +342,7 @@ func ParseQuery(s string) (*Query, error) {
 	return result, nil
 }
 
-func parseRequestCondition(tokenizer *Tokenizer) (RequestCondition, error) {
+func parseRequestCondition(tokenizer *Tokenizer, andOr bool) (RequestCondition, error) {
 	nt, err := tokenizer.PeekToken()
 	if err != nil {
 		return nil, err
@@ -352,7 +355,7 @@ func parseRequestCondition(tokenizer *Tokenizer) (RequestCondition, error) {
 			return nil, err
 		}
 
-		cond, err := parseRequestCondition(tokenizer)
+		cond, err := parseRequestCondition(tokenizer, true)
 		if err != nil {
 			return nil, err
 		}
@@ -402,12 +405,29 @@ func parseRequestCondition(tokenizer *Tokenizer) (RequestCondition, error) {
 		if err != nil {
 			return nil, err
 		}
+	case TokenLogicalOpNot:
+		if err := tokenizer.AssertNextToken(TokenLogicalOpNot); err != nil {
+			return nil, err
+		}
+
+		cond, err = parseRequestCondition(tokenizer, false)
+		if err != nil {
+			return nil, err
+		}
+
+		cond = &NotCondition{
+			Condition: cond,
+		}
 	default:
 		if nt == TEOF {
 			return nil, fmt.Errorf("expected a request condition. Found input end instead")
 		}
 
 		return nil, fmt.Errorf("expected a request condition. Found '%s' instead", nt)
+	}
+
+	if !andOr {
+		return cond, nil
 	}
 
 	nt, err = tokenizer.PeekToken()
@@ -421,7 +441,7 @@ func parseRequestCondition(tokenizer *Tokenizer) (RequestCondition, error) {
 			return nil, err
 		}
 
-		cond2, err := parseRequestCondition(tokenizer)
+		cond2, err := parseRequestCondition(tokenizer, true)
 		if err != nil {
 			return nil, err
 		}
@@ -436,7 +456,7 @@ func parseRequestCondition(tokenizer *Tokenizer) (RequestCondition, error) {
 			return nil, err
 		}
 
-		cond2, err := parseRequestCondition(tokenizer)
+		cond2, err := parseRequestCondition(tokenizer, true)
 		if err != nil {
 			return nil, err
 		}
