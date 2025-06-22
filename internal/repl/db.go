@@ -138,7 +138,6 @@ func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height i
 	})
 
 	requestsTable.SetRowKeyBinding("s", func(row RequestsTableRow) tea.Cmd {
-		output := requestsTable.TableRawView()
 		reqId := row[1]
 
 		return func() tea.Msg {
@@ -176,15 +175,13 @@ func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height i
 				}
 			}
 
-			output += "\nscript file saved to " + req.ID + ".py"
-			return replit.ExitView{
-				Output: output,
+			return requestTableViewMessage{
+				message: "script file saved to " + req.ID + ".py",
 			}
 		}
 	})
 
 	requestsTable.SetRowKeyBinding("t", func(row RequestsTableRow) tea.Cmd {
-		output := requestsTable.TableRawView()
 		reqId := row[1]
 
 		return func() tea.Msg {
@@ -210,7 +207,7 @@ func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height i
 				}
 			}
 
-			f, err := os.OpenFile(req.ID+".lua", os.O_RDWR|os.O_CREATE, 0700)
+			f, err := os.OpenFile(req.ID+".lua", os.O_RDWR|os.O_CREATE, 0600)
 			if err != nil {
 				return replit.ExitView{
 					Error: err,
@@ -229,9 +226,8 @@ func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height i
 				}
 			}
 
-			output += "\nscript file saved to " + req.ID + ".lua"
-			return replit.ExitView{
-				Output: output,
+			return requestTableViewMessage{
+				message: "script file saved to " + req.ID + ".lua",
 			}
 		}
 	})

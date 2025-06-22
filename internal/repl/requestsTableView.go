@@ -2,6 +2,7 @@ package repl
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/artilugio0/replit"
 	"github.com/charmbracelet/bubbles/table"
@@ -36,6 +37,8 @@ type RequestsTableView struct {
 	focus        int
 	focusStyle   lipgloss.Style
 	unfocusStyle lipgloss.Style
+
+	message string
 }
 
 func NewRequestsTableView(width, height int) *RequestsTableView {
@@ -115,6 +118,8 @@ func (v *RequestsTableView) SetRows(rows []RequestsTableRow) {
 		table.WithWidth(v.width),
 	)
 
+	v.message = fmt.Sprintf("%d requests found", len(v.table.Rows()))
+
 	v.updateViewports()
 }
 
@@ -184,6 +189,17 @@ func (v *RequestsTableView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		v.vp1.SetSize(v.width/2, v.height-tableHeight)
 		v.vp2.SetSize(v.width/2+v.width%2, v.height-tableHeight)
+
+	case requestTableViewMessage:
+		if msg.message != "" {
+			v.message = msg.message
+			return v, func() tea.Msg {
+				time.Sleep(3 * time.Second)
+				return requestTableViewMessage{message: ""}
+			}
+		}
+
+		v.message = fmt.Sprintf("%d requests found", len(v.table.Rows()))
 	}
 
 	var cmd tea.Cmd
@@ -219,7 +235,7 @@ func (v *RequestsTableView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (v *RequestsTableView) View() string {
 	table := v.table.View()
-	table += fmt.Sprintf("\n%d requests found", len(v.table.Rows()))
+	table += "\n" + v.message
 
 	viewports := lipgloss.JoinHorizontal(lipgloss.Bottom, v.vp1.View(), v.vp2.View())
 	output := lipgloss.JoinVertical(lipgloss.Left, table, viewports)
@@ -249,9 +265,6 @@ func (v *RequestsTableView) TableRawView() string {
 	return output
 }
 
-// cmdDone is a message indicating that a repl command has finishied
-// its execution
-type CmdDone struct {
-	Output string
-	Err    error
+type requestTableViewMessage struct {
+	message string
 }
