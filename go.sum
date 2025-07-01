@@ -16,6 +16,8 @@ github.com/artilugio0/efin-testifier v0.0.0-20250628161214-58a75c37488a h1:CDS00
 github.com/artilugio0/efin-testifier v0.0.0-20250628161214-58a75c37488a/go.mod h1:/txnpNHzY+Szl+2eCKFkvo9oJY6BPyigx9UplNrt1OM=
 github.com/artilugio0/efin-testifier v0.0.0-20250628170410-5fb49fd11488 h1:oxcljXyiQPiz5g9LWIIrcvLt9tzgDLOrt6NziLUALzw=
 github.com/artilugio0/efin-testifier v0.0.0-20250628170410-5fb49fd11488/go.mod h1:/txnpNHzY+Szl+2eCKFkvo9oJY6BPyigx9UplNrt1OM=
+github.com/artilugio0/efin-testifier v0.0.0-20250701132306-414955ec7b9e h1:ztDEv7EngLn3xsEgFFB8tXTDfFl7wO/kBtX9DH0Q6PM=
+github.com/artilugio0/efin-testifier v0.0.0-20250701132306-414955ec7b9e/go.mod h1:/txnpNHzY+Szl+2eCKFkvo9oJY6BPyigx9UplNrt1OM=
 github.com/artilugio0/replit v0.0.0-20250609151101-5ec36a509a87 h1:IVrHfIWabV5y23VUKW5vGFrDiFKPHG8tpuFb8Ov3G5I=
 github.com/artilugio0/replit v0.0.0-20250609151101-5ec36a509a87/go.mod h1:1i41aNOl03/IDzzwT6GG6lCYoSLdLl7TYupNLwFaYbk=
 github.com/artilugio0/replit v0.0.0-20250617010735-bec2b65473ec h1:iAn6+TWWu7BRJ8KkAzyfBEgs9agEEAtVfWMaVGtquT0=
