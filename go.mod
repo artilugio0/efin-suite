@@ -3,7 +3,7 @@ module github.com/artilugio0/efin-suite
 go 1.24.3
 
 require (
-	github.com/artilugio0/efin-proxy v0.0.0-20250621173402-dfae4be2c77d // indirect
+	github.com/artilugio0/efin-proxy v0.0.0-20250703140610-6646775b3764 // indirect
 	github.com/artilugio0/efin-testifier v0.0.0-20250702151505-2858b6dfc412 // indirect
 	github.com/artilugio0/replit v0.0.0-20250617010735-bec2b65473ec // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
