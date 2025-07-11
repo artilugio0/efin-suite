@@ -13,7 +13,9 @@ request = {
   {{- end }}
   },
   {{- if .Body }}
-    {{- if not (contains_bytes .Body "'") }}
+    {{- if contains_bytes .Body "\n" }}
+  body = [==[{{ printf "%s" .Body }}]==],
+    {{- else if not (contains_bytes .Body "'") }}
   body = '{{ printf "%s" .Body }}',
     {{- else if not (contains_bytes .Body "\"") }}
   body = "{{ printf "%s" .Body }}",
