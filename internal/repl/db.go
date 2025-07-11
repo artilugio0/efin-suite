@@ -232,6 +232,52 @@ func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height i
 		}
 	})
 
+	requestsTable.SetRowKeyBinding("c", func(row RequestsTableRow) tea.Cmd {
+		reqId := row[1]
+
+		return func() tea.Msg {
+			req, err := getRequest(dbFile, reqId)
+			if err != nil {
+				return replit.ExitView{
+					Error: err,
+				}
+			}
+
+			funcs := map[string]any{
+				"contains": strings.Contains,
+				"contains_bytes": func(s []byte, c string) bool {
+					return bytes.Contains(s, []byte(c))
+				},
+			}
+
+			scriptTpl := templates.GetRequestTestifierScript()
+			t, err := template.New("make_request").Funcs(funcs).Parse(scriptTpl)
+			if err != nil {
+				return replit.ExitView{
+					Error: err,
+				}
+			}
+
+			f := &strings.Builder{}
+
+			if err := t.Execute(f, req); err != nil {
+				return replit.ExitView{
+					Error: err,
+				}
+			}
+
+			if err := copyToClipboard(f.String()); err != nil {
+				return replit.ExitView{
+					Error: err,
+				}
+			}
+
+			return requestTableViewMessage{
+				message: "script copied to clipboard",
+			}
+		}
+	})
+
 	requestsTable.SetRowKeyBinding("r", func(row RequestsTableRow) tea.Cmd {
 		reqId := row[1]
 		output := requestsTable.TableRawView()
