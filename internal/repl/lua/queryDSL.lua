@@ -103,3 +103,86 @@ function dump_ast(t, indent)
   end
   return s .. indent .. '}'
 end
+
+-- Pretty-print a table with support for nested tables and arrays
+function p(t, indent, visited)
+  indent = indent or 0
+  visited = visited or {}
+  local indent_str = string.rep('  ', indent)
+
+  -- Handle non-table types
+  if type(t) ~= 'table' then
+    if type(t) == 'string' then
+      return string.format("%q", t) -- Quote strings properly
+    elseif t == nil then
+      return 'nil'
+    elseif type(t) == 'boolean' or type(t) == 'number' then
+      return tostring(t)
+    else
+      return '"[' .. type(t) .. ']"'
+    end
+  end
+
+  -- Check for cyclic reference
+  if visited[t] then
+    return '"[cyclic reference]"'
+  end
+  visited[t] = true
+
+  -- Determine if table is an array (sequential numeric keys starting from 1)
+  local is_array = true
+  local max_numeric_key = 0
+  local count = 0
+  for k, _ in pairs(t) do
+    count = count + 1
+    if type(k) ~= 'number' or k < 1 or k ~= math.floor(k) then
+      is_array = false
+    else
+      max_numeric_key = math.max(max_numeric_key, k)
+    end
+  end
+  is_array = is_array and count == max_numeric_key and max_numeric_key > 0
+
+  local result = '{'
+  local inner_indent = string.rep('  ', indent + 1)
+  local items = {}
+
+  if is_array then
+    -- Handle array-like table, skipping nil values
+    for i = 1, max_numeric_key do
+      local v = t[i]
+      if v ~= nil then
+        if i == #items + 1 then
+          -- Sequential key, omit index
+          table.insert(items, inner_indent .. pretty_print_table(v, indent + 1, visited))
+        else
+          -- Sparse key, use explicit index
+          table.insert(items, inner_indent .. '[' .. i .. '] = ' .. pretty_print_table(v, indent + 1, visited))
+        end
+      end
+    end
+  else
+    -- Handle dictionary-like table
+    local keys = {}
+    for k in pairs(t) do table.insert(keys, k) end
+    table.sort(keys, function(a, b)
+      if type(a) == type(b) then return tostring(a) < tostring(b) end
+      return type(a) < type(b)
+    end)
+    for _, k in ipairs(keys) do
+      local v = t[k]
+      local key_str
+      if type(k) == 'string' then
+        key_str = string.format("[%q]", k) -- Always quote string keys
+      else
+        key_str = '[' .. pretty_print_table(k, indent + 1, visited) .. ']'
+      end
+      table.insert(items, inner_indent .. key_str .. ' = ' .. pretty_print_table(v, indent + 1, visited))
+    end
+  end
+
+  if #items > 0 then
+    result = result .. '\n' .. table.concat(items, ',\n') .. '\n' .. indent_str
+  end
+  return result .. '}'
+end

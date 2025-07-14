@@ -68,11 +68,13 @@ func (le *luaEvaluator) Eval(input string) (*replit.Result, error) {
 					width, height := le.repl.GetWidth(), le.repl.GetHeight()
 
 					return &replit.Result{
-						View: NewQueryResultsView(le.dbFile, rows, width, height),
+						View: NewQueryResultsView(le.dbFile, le.l, rows, width, height),
 					}, nil
 				}
 			}
 		}
+
+		out += value.String()
 	}
 
 	return &replit.Result{

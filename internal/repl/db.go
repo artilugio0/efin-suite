@@ -15,30 +15,9 @@ import (
 	"github.com/artilugio0/efin-suite/internal/templates"
 	"github.com/artilugio0/replit"
 	tea "github.com/charmbracelet/bubbletea"
+	lua "github.com/yuin/gopher-lua"
 	_ "modernc.org/sqlite"
 )
-
-func queryCmd(ctx context.Context, dbFile string, queryStr string, width, height int) (*replit.Result, error) {
-	query, err := ql.ParseQuery(queryStr)
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := doRequestQuery(ctx, dbFile, query)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(rows) == 0 {
-		return &replit.Result{
-			Output: "0 requests found",
-		}, nil
-	}
-
-	return &replit.Result{
-		View: NewQueryResultsView(dbFile, rows, width, height),
-	}, nil
-}
 
 func doRequestQuery(ctx context.Context, dbFile string, query *ql.Query) ([]RequestsTableRow, error) {
 	compiled, values, err := query.Compile()
@@ -87,7 +66,7 @@ type QueryResultsView struct {
 	queryRunning      bool
 }
 
-func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height int) *QueryResultsView {
+func NewQueryResultsView(dbFile string, L *lua.LState, rows []RequestsTableRow, width, height int) *QueryResultsView {
 	requestsTable := NewRequestsTableView(width, height)
 	requestsTable.SetRows([]RequestsTableRow(rows))
 	requestsTable.SetUpdateFns(func(r RequestsTableRow) string {
@@ -107,8 +86,6 @@ func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height i
 	})
 
 	requestsTable.SetRowKeyBinding("enter", func(row RequestsTableRow) tea.Cmd {
-		output := requestsTable.TableRawView()
-
 		return func() tea.Msg {
 			req, resp, err := getRequestResponse(dbFile, row[1])
 			if err != nil {
@@ -117,66 +94,53 @@ func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height i
 				}
 			}
 
-			if req != nil {
-				output += "\n\nRequest ID: " + req.ID
-				output += "\n\n" + rawRequestString(req)
-			} else {
-				output += "\n\n\nRequest not found"
+			// Create request table.
+			reqTable := L.NewTable()
+			// Set reqonse headers.
+			reqHeadersTable := L.NewTable()
+			reqHVals := map[string]*lua.LTable{}
+			for _, header := range req.Headers {
+				vt, ok := reqHVals[header.Name]
+				if !ok {
+					reqHVals[header.Name] = L.NewTable()
+					vt = reqHVals[header.Name]
+				}
+				vt.Append(lua.LString(header.Value))
 			}
+			for key, vals := range reqHVals {
+				L.SetField(reqHeadersTable, key, vals)
+			}
+			L.SetField(reqTable, "url", lua.LString(req.URL))
+			L.SetField(reqTable, "method", lua.LString(req.Method))
+			L.SetField(reqTable, "headers", reqHeadersTable)
+			L.SetField(reqTable, "body", lua.LString(req.Body))
 
-			if resp != nil {
-				output += "\n\n\nResponse:"
-				output += "\n\n" + rawResponseString(resp)
-			} else {
-				output += "\n\n\nResponse not found"
+			L.SetGlobal("request", reqTable)
+
+			// Create response table.
+			respTable := L.NewTable()
+			// Set response headers.
+			respHeadersTable := L.NewTable()
+			respHVals := map[string]*lua.LTable{}
+			for _, header := range resp.Headers {
+				vt, ok := respHVals[header.Name]
+				if !ok {
+					respHVals[header.Name] = L.NewTable()
+					vt = respHVals[header.Name]
+				}
+				vt.Append(lua.LString(header.Value))
 			}
+			for key, vals := range respHVals {
+				L.SetField(respHeadersTable, key, vals)
+			}
+			L.SetField(respTable, "status_code", lua.LNumber(resp.Status))
+			L.SetField(respTable, "headers", respHeadersTable)
+			L.SetField(respTable, "body", lua.LString(resp.Body))
+
+			L.SetGlobal("response", respTable)
 
 			return replit.ExitView{
-				Output: output,
-			}
-		}
-	})
-
-	requestsTable.SetRowKeyBinding("s", func(row RequestsTableRow) tea.Cmd {
-		reqId := row[1]
-
-		return func() tea.Msg {
-			req, err := getRequest(dbFile, reqId)
-			if err != nil {
-				return replit.ExitView{
-					Error: err,
-				}
-			}
-
-			scriptTpl := templates.GetRequestPythonScript()
-			t, err := template.New("make_request").Parse(scriptTpl)
-			if err != nil {
-				return replit.ExitView{
-					Error: err,
-				}
-			}
-
-			f, err := os.OpenFile(req.ID+".py", os.O_RDWR|os.O_CREATE, 0700)
-			if err != nil {
-				return replit.ExitView{
-					Error: err,
-				}
-			}
-
-			err = t.Execute(f, req)
-			if err != nil {
-				return replit.ExitView{
-					Error: err,
-				}
-			}
-			if err := f.Close(); err != nil {
-				return replit.ExitView{
-					Error: err,
-				}
-			}
-
-			return requestTableViewMessage{
-				message: "script file saved to " + req.ID + ".py",
+				Output: "saved to 'request' and 'response' variables",
 			}
 		}
 	})
@@ -274,56 +238,6 @@ func NewQueryResultsView(dbFile string, rows []RequestsTableRow, width, height i
 
 			return requestTableViewMessage{
 				message: "script copied to clipboard",
-			}
-		}
-	})
-
-	requestsTable.SetRowKeyBinding("r", func(row RequestsTableRow) tea.Cmd {
-		reqId := row[1]
-		output := requestsTable.TableRawView()
-
-		return func() tea.Msg {
-			req, err := getRequest(dbFile, reqId)
-			if err != nil {
-				return replit.ExitView{
-					Error: err,
-				}
-			}
-
-			if req != nil {
-				output += "\n\nRequest ID: " + req.ID
-				output += "\n\n" + rawRequestString(req)
-			} else {
-				output += "\n\n\nRequest not found"
-			}
-
-			return replit.ExitView{
-				Output: output,
-			}
-		}
-	})
-
-	requestsTable.SetRowKeyBinding("R", func(row RequestsTableRow) tea.Cmd {
-		reqId := row[1]
-		output := requestsTable.TableRawView()
-
-		return func() tea.Msg {
-			_, resp, err := getRequestResponse(dbFile, reqId)
-			if err != nil {
-				return replit.ExitView{
-					Error: err,
-				}
-			}
-
-			if resp != nil {
-				output += "\n\nResponse ID: " + resp.ID
-				output += "\n\n" + rawResponseString(resp)
-			} else {
-				output += "\n\n\nResponse not found"
-			}
-
-			return replit.ExitView{
-				Output: output,
 			}
 		}
 	})
