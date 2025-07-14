@@ -154,10 +154,10 @@ function p(t, indent, visited)
       if v ~= nil then
         if i == #items + 1 then
           -- Sequential key, omit index
-          table.insert(items, inner_indent .. pretty_print_table(v, indent + 1, visited))
+          table.insert(items, inner_indent .. p(v, indent + 1, visited))
         else
           -- Sparse key, use explicit index
-          table.insert(items, inner_indent .. '[' .. i .. '] = ' .. pretty_print_table(v, indent + 1, visited))
+          table.insert(items, inner_indent .. '[' .. i .. '] = ' .. p(v, indent + 1, visited))
         end
       end
     end
@@ -175,9 +175,9 @@ function p(t, indent, visited)
       if type(k) == 'string' then
         key_str = string.format("[%q]", k) -- Always quote string keys
       else
-        key_str = '[' .. pretty_print_table(k, indent + 1, visited) .. ']'
+        key_str = '[' .. p(k, indent + 1, visited) .. ']'
       end
-      table.insert(items, inner_indent .. key_str .. ' = ' .. pretty_print_table(v, indent + 1, visited))
+      table.insert(items, inner_indent .. key_str .. ' = ' .. p(v, indent + 1, visited))
     end
   end
 
