@@ -179,11 +179,11 @@ func (c *RequestTimestampCondition) GetRequestConditionString() (string, []any, 
 		op = "="
 	case "lt":
 		op = "<"
-	case "lte":
+	case "le":
 		op = "<="
 	case "gt":
 		op = ">"
-	case "gte":
+	case "ge":
 		op = ">="
 	default:
 		return "", nil, fmt.Errorf("invalid operator '%s'", c.Operator)
@@ -209,11 +209,11 @@ func (c *RequestResponseStatusCondition) GetRequestConditionString() (string, []
 		op = "="
 	case "lt":
 		op = "<"
-	case "lte":
+	case "le":
 		op = "<="
 	case "gt":
 		op = ">"
-	case "gte":
+	case "ge":
 		op = ">="
 	default:
 		return "", nil, fmt.Errorf("invalid operator '%s'", c.Operator)

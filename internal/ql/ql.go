@@ -48,9 +48,9 @@ const (
 	TokenKeywordCount     TokenKeyword     = "count"
 	TokenOrderOpEq        TokenOrderOp     = "eq"
 	TokenOrderOpGt        TokenOrderOp     = "gt"
-	TokenOrderOpGte       TokenOrderOp     = "gte"
+	TokenOrderOpGte       TokenOrderOp     = "ge"
 	TokenOrderOpLt        TokenOrderOp     = "lt"
-	TokenOrderOpLte       TokenOrderOp     = "lte"
+	TokenOrderOpLte       TokenOrderOp     = "le"
 	TokenDot              TokenDotOp       = "dot"
 	TokenExists           TokenExistsOp    = "exists"
 	TokenContains         TokenContainsOp  = "contains"
@@ -486,11 +486,11 @@ func parseRequestTimestampCondition(tokenizer *Tokenizer) (*RequestTimestampCond
 	case TokenOrderOpLt:
 		operator = "lt"
 	case TokenOrderOpLte:
-		operator = "lte"
+		operator = "le"
 	case TokenOrderOpGt:
 		operator = "gt"
 	case TokenOrderOpGte:
-		operator = "gte"
+		operator = "ge"
 	default:
 		return nil, fmt.Errorf("unknown timestamp operator: '%s'", *orderOp)
 	}
@@ -819,11 +819,11 @@ func parseRequestResponseStatusCondition(tokenizer *Tokenizer) (*RequestResponse
 	case TokenOrderOpLt:
 		operator = "lt"
 	case TokenOrderOpLte:
-		operator = "lte"
+		operator = "le"
 	case TokenOrderOpGt:
 		operator = "gt"
 	case TokenOrderOpGte:
-		operator = "gte"
+		operator = "ge"
 	default:
 		return nil, fmt.Errorf("unknown status operator: '%s'", operator)
 	}
