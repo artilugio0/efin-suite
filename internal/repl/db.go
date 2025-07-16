@@ -99,6 +99,7 @@ func NewQueryResultsView(dbFile string, L *lua.LState, rows []RequestsTableRow, 
 			// Set reqonse headers.
 			reqHeadersTable := L.NewTable()
 			reqHVals := map[string]*lua.LTable{}
+			host := ""
 			for _, header := range req.Headers {
 				vt, ok := reqHVals[header.Name]
 				if !ok {
@@ -106,11 +107,14 @@ func NewQueryResultsView(dbFile string, L *lua.LState, rows []RequestsTableRow, 
 					vt = reqHVals[header.Name]
 				}
 				vt.Append(lua.LString(header.Value))
+				if strings.ToLower(header.Name) == "host" {
+					host = header.Value
+				}
 			}
 			for key, vals := range reqHVals {
 				L.SetField(reqHeadersTable, key, vals)
 			}
-			L.SetField(reqTable, "url", lua.LString(req.URL))
+			L.SetField(reqTable, "url", lua.LString("https://"+host+req.URL))
 			L.SetField(reqTable, "method", lua.LString(req.Method))
 			L.SetField(reqTable, "headers", reqHeadersTable)
 			L.SetField(reqTable, "body", lua.LString(req.Body))

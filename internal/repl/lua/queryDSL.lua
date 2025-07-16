@@ -186,3 +186,37 @@ function p(t, indent, visited)
   end
   return result .. '}'
 end
+
+-- Deep copy a table, handling nested tables and cycles
+function deep_copy(t, visited)
+  -- Initialize visited table to track cyclic references
+  visited = visited or {}
+
+  -- Handle non-table types
+  if type(t) ~= 'table' then
+    return t
+  end
+
+  -- Check for cyclic reference
+  if visited[t] then
+    return nil -- Return nil for cycles (or could error/return placeholder)
+  end
+  visited[t] = true
+
+  -- Create new table for the copy
+  local copy = {}
+
+  -- Copy all key-value pairs
+  for k, v in pairs(t) do
+    -- Recursively copy keys and values that are tables
+    copy[deep_copy(k, visited)] = deep_copy(v, visited)
+  end
+
+  -- Copy the metatable, if any
+  local mt = getmetatable(t)
+  if mt then
+    setmetatable(copy, deep_copy(mt, visited))
+  end
+
+  return copy
+end
