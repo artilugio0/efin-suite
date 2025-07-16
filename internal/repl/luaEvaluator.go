@@ -11,6 +11,7 @@ import (
 	_ "embed"
 
 	"github.com/artilugio0/efin-suite/internal/ql"
+	"github.com/artilugio0/efin-testifier/pkg/liblua"
 	"github.com/artilugio0/replit"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -27,6 +28,7 @@ type luaEvaluator struct {
 func newLuaEvaluator(dbFile string) *luaEvaluator {
 	L := lua.NewState()
 	L.OpenLibs()
+	liblua.RegisterCommonRuntimeFunctions(L, 20)
 
 	if err := L.DoString(queryDSLSource); err != nil {
 		panic(err)
