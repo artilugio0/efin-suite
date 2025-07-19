@@ -76,7 +76,7 @@ func (le *luaEvaluator) Eval(input string) (*replit.Result, error) {
 			}
 		}
 
-		out += value.String()
+		out += le.l.ToStringMeta(value).String()
 	}
 
 	return &replit.Result{
@@ -94,7 +94,7 @@ func execLua(L *lua.LState, code string) (lua.LValue, string, error) {
 		n := ls.GetTop()
 		args := []string{}
 		for i := 1; i <= n; i++ {
-			args = append(args, ls.ToString(i))
+			args = append(args, ls.ToStringMeta(ls.Get(i)).String())
 		}
 		prints = append(prints, strings.Join(args, "\t"))
 		return 0

@@ -13,6 +13,7 @@ import (
 
 	"github.com/artilugio0/efin-suite/internal/ql"
 	"github.com/artilugio0/efin-suite/internal/templates"
+	"github.com/artilugio0/efin-testifier/pkg/liblua"
 	"github.com/artilugio0/replit"
 	tea "github.com/charmbracelet/bubbletea"
 	lua "github.com/yuin/gopher-lua"
@@ -95,52 +96,10 @@ func NewQueryResultsView(dbFile string, L *lua.LState, rows []RequestsTableRow, 
 			}
 
 			// Create request table.
-			reqTable := L.NewTable()
-			// Set reqonse headers.
-			reqHeadersTable := L.NewTable()
-			reqHVals := map[string]*lua.LTable{}
-			host := ""
-			for _, header := range req.Headers {
-				vt, ok := reqHVals[header.Name]
-				if !ok {
-					reqHVals[header.Name] = L.NewTable()
-					vt = reqHVals[header.Name]
-				}
-				vt.Append(lua.LString(header.Value))
-				if strings.ToLower(header.Name) == "host" {
-					host = header.Value
-				}
-			}
-			for key, vals := range reqHVals {
-				L.SetField(reqHeadersTable, key, vals)
-			}
-			L.SetField(reqTable, "url", lua.LString("https://"+host+req.URL))
-			L.SetField(reqTable, "method", lua.LString(req.Method))
-			L.SetField(reqTable, "headers", reqHeadersTable)
-			L.SetField(reqTable, "body", lua.LString(req.Body))
+			reqTable := liblua.HTTPRequestToTable(L, req.HTTPRequest)
+			respTable := liblua.HTTPResponseToTable(L, resp.HTTPResponse)
 
 			L.SetGlobal("request", reqTable)
-
-			// Create response table.
-			respTable := L.NewTable()
-			// Set response headers.
-			respHeadersTable := L.NewTable()
-			respHVals := map[string]*lua.LTable{}
-			for _, header := range resp.Headers {
-				vt, ok := respHVals[header.Name]
-				if !ok {
-					respHVals[header.Name] = L.NewTable()
-					vt = respHVals[header.Name]
-				}
-				vt.Append(lua.LString(header.Value))
-			}
-			for key, vals := range respHVals {
-				L.SetField(respHeadersTable, key, vals)
-			}
-			L.SetField(respTable, "status_code", lua.LNumber(resp.Status))
-			L.SetField(respTable, "headers", respHeadersTable)
-			L.SetField(respTable, "body", lua.LString(resp.Body))
-
 			L.SetGlobal("response", respTable)
 
 			return replit.ExitView{
@@ -322,9 +281,9 @@ func getRequest(dbFile, id string) (*requestEntry, error) {
 	defer reqHeadersRow.Close()
 
 	// TODO: add concurrency to speed up this function
-	reqHeaders := []headerEntry{}
+	reqHeaders := []liblua.HeaderEntry{}
 	for reqHeadersRow.Next() {
-		h := headerEntry{}
+		h := liblua.HeaderEntry{}
 		if err := reqHeadersRow.Scan(&h.Name, &h.Value); err != nil {
 			return nil, err
 		}
@@ -362,7 +321,7 @@ func getResponse(dbFile, id string) (*responseEntry, error) {
 		return nil, err
 	}
 	resp := responseEntry{}
-	if err := respRow.Scan(&resp.ID, &resp.Status, &resp.Body); err != nil {
+	if err := respRow.Scan(&resp.ID, &resp.StatusCode, &resp.Body); err != nil {
 		return nil, err
 	}
 
@@ -377,9 +336,9 @@ func getResponse(dbFile, id string) (*responseEntry, error) {
 	}
 	defer respHeadersRows.Close()
 
-	respHeaders := []headerEntry{}
+	respHeaders := []liblua.HeaderEntry{}
 	for respHeadersRows.Next() {
-		h := headerEntry{}
+		h := liblua.HeaderEntry{}
 		if err := respHeadersRows.Scan(&h.Name, &h.Value); err != nil {
 			return nil, err
 		}
@@ -410,22 +369,12 @@ type requestEntry struct {
 	ID        string
 	Timestamp string
 	Host      string
-	Method    string
-	URL       string
-	Body      []byte
-	Headers   []headerEntry
+	liblua.HTTPRequest
 }
 
 type responseEntry struct {
-	ID      string
-	Status  int
-	Body    []byte
-	Headers []headerEntry
-}
-
-type headerEntry struct {
-	Name  string
-	Value string
+	ID string
+	liblua.HTTPResponse
 }
 
 func rawRequestString(req *requestEntry) string {
@@ -437,21 +386,21 @@ func rawRequestString(req *requestEntry) string {
 	}
 
 	buf.WriteString("\n")
-	buf.Write(req.Body)
+	buf.Write([]byte(req.Body))
 
 	return string(buf.Bytes())
 }
 
 func rawResponseString(resp *responseEntry) string {
 	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("HTTP/1.1 %d %s\n", resp.Status, http.StatusText(resp.Status)))
+	buf.WriteString(fmt.Sprintf("HTTP/1.1 %d %s\n", resp.StatusCode, http.StatusText(resp.StatusCode)))
 
 	for _, h := range resp.Headers {
 		buf.WriteString(fmt.Sprintf("%s: %s\n", h.Name, h.Value))
 	}
 
 	buf.WriteString("\n")
-	buf.Write(resp.Body)
+	buf.Write([]byte(resp.Body))
 
 	return string(buf.Bytes())
 }
