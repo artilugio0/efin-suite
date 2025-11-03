@@ -188,6 +188,7 @@ function p(t, indent, visited)
 end
 
 -- Deep copy a table, handling nested tables and cycles
+-- TODO: remove this as it has been added into common definitions
 function deep_copy(t, visited)
   -- Initialize visited table to track cyclic references
   visited = visited or {}
