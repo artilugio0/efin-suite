@@ -4,7 +4,7 @@ go 1.24.3
 
 require (
 	github.com/artilugio0/efin-proxy v0.0.0-20250703140610-6646775b3764
-	github.com/artilugio0/efin-testifier v0.0.0-20250719151230-cb93b78f3b90
+	github.com/artilugio0/efin-testifier v0.1.0
 	github.com/artilugio0/replit v0.0.0-20250617010735-bec2b65473ec
 	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.5

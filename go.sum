@@ -2,6 +2,8 @@ github.com/artilugio0/efin-proxy v0.0.0-20250703140610-6646775b3764 h1:oaU4r4aOd
 github.com/artilugio0/efin-proxy v0.0.0-20250703140610-6646775b3764/go.mod h1:/fjZRcB1SGOnOTAu27crXjH+OtZvYXEuzZkcpuhS9Ko=
 github.com/artilugio0/efin-testifier v0.0.0-20250719151230-cb93b78f3b90 h1:Zzs944AuXIYbBg+iPUM7tCO+L3r5C5Qfvr0h1MPZ9kc=
 github.com/artilugio0/efin-testifier v0.0.0-20250719151230-cb93b78f3b90/go.mod h1:/txnpNHzY+Szl+2eCKFkvo9oJY6BPyigx9UplNrt1OM=
+github.com/artilugio0/efin-testifier v0.1.0 h1:8TD8CdSfV9Y9C4nBsLakfE9g4mMmznzXB+RjHEjP7B8=
+github.com/artilugio0/efin-testifier v0.1.0/go.mod h1:t+68Uio4DIfsllUk3WEz+wgt9O1xVKVW01gb68fYHAM=
 github.com/artilugio0/replit v0.0.0-20250617010735-bec2b65473ec h1:iAn6+TWWu7BRJ8KkAzyfBEgs9agEEAtVfWMaVGtquT0=
 github.com/artilugio0/replit v0.0.0-20250617010735-bec2b65473ec/go.mod h1:1i41aNOl03/IDzzwT6GG6lCYoSLdLl7TYupNLwFaYbk=
 github.com/atotto/clipboard v0.1.4 h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z4=
