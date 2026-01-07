@@ -14,8 +14,8 @@ BINARY_NAME="efin"
 # Ensure the build directory exists.
 mkdir -p "$BUILD_DIR"
 
-# Compile the Go program with CGO_ENABLED=0.
-CGO_ENABLED=0 go build -o "$BUILD_DIR/$BINARY_NAME" "$SRC_DIR"
+# Compile the Go program
+go build -o "$BUILD_DIR/$BINARY_NAME" "$SRC_DIR"
 
 # Check if the compilation was successful.
 if [ $? -eq 0 ]; then
