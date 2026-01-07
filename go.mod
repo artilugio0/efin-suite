@@ -3,9 +3,8 @@ module github.com/artilugio0/efin-suite
 go 1.25.5
 
 require (
-	github.com/artilugio0/efin-proxy v0.0.0-20260107145322-971c3aec5d3c
+	github.com/artilugio0/efin-proxy v0.0.0-20260107182437-b2d459eeabba
 	github.com/artilugio0/efin-testifier v0.1.0
-	github.com/artilugio0/efin-ui v0.0.0-20260107144854-6ba8f55543bf
 	github.com/artilugio0/replit v0.0.0-20250617010735-bec2b65473ec
 	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.5
@@ -13,13 +12,14 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/yuin/gopher-lua v1.1.1
 	google.golang.org/grpc v1.73.0
-	modernc.org/sqlite v1.42.0
+	modernc.org/sqlite v1.42.2
 )
 
 require (
 	fyne.io/fyne/v2 v2.7.1 // indirect
 	fyne.io/systray v1.11.1-0.20250603113521-ca66a66d8b58 // indirect
 	github.com/BurntSushi/toml v1.5.0 // indirect
+	github.com/artilugio0/efin-ui v0.0.0-20260107190759-be861a9a0cb3 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
